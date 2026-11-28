@@ -1,7 +1,8 @@
 """Gera o feed RSS do podcast "Horóscopo do Dia com a Dina" (só biblioteca padrão do Python).
 
 Só entram os episódios cuja data já chegou em Brasília, então os áudios podem ser enviados com antecedência.
-Uso: python3 podcast/gerar_feed.py [pasta_de_saida]   (lê podcast/podcast.json e podcast/episodios.json)
+Uso: python3 podcast/gerar_feed.py [pasta]   (lê pasta/podcast.json e pasta/episodios.json; padrão: podcast/)
+Serve para mais de um podcast: o campo "guid" do podcast.json prefixa o id dos episódios e "hora" é a hora de saída.
 """
 import json
 import os
@@ -49,22 +50,22 @@ def gerar_feed(pod: dict, episodios: list, hoje: date) -> str:
         _sub(i, "description", ep["descricao"])
         _sub(i, f"{{{IT}}}summary", ep["descricao"])
         _sub(i, "enclosure", url=pod["base"] + ep["arquivo"], length=ep["bytes"], type="audio/mpeg")
-        _sub(i, "guid", f"dinohoroscopo-{ep['data']}", isPermaLink="false")
-        _sub(i, "pubDate", format_datetime(datetime(d.year, d.month, d.day, 4, 0, tzinfo=TZ)))
+        _sub(i, "guid", f"{pod.get('guid', 'dinohoroscopo')}-{ep['data']}", isPermaLink="false")
+        _sub(i, "pubDate", format_datetime(datetime(d.year, d.month, d.day, pod.get("hora", 4), 0, tzinfo=TZ)))
         _sub(i, f"{{{IT}}}duration", ep["duracao_s"])
         _sub(i, f"{{{IT}}}explicit", "false")
         _sub(i, f"{{{IT}}}episodeType", ep.get("tipo", "full"))
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(rss, encoding="unicode")
 
 
-def main():
-    aqui = os.path.dirname(os.path.abspath(__file__))
-    saida = sys.argv[1] if len(sys.argv) > 1 else aqui
-    pod = json.load(open(os.path.join(aqui, "podcast.json"), encoding="utf-8"))
-    eps = json.load(open(os.path.join(aqui, "episodios.json"), encoding="utf-8"))
+def main(argv=None):
+    """argv[0] (opcional) = pasta do podcast, com podcast.json e episodios.json; o feed.xml é gravado nela."""
+    argv = sys.argv[1:] if argv is None else argv
+    pasta = argv[0] if argv else os.path.dirname(os.path.abspath(__file__))
+    pod = json.load(open(os.path.join(pasta, "podcast.json"), encoding="utf-8"))
+    eps = json.load(open(os.path.join(pasta, "episodios.json"), encoding="utf-8"))
     hoje = datetime.now(TZ).date()
-    os.makedirs(saida, exist_ok=True)
-    with open(os.path.join(saida, "feed.xml"), "w", encoding="utf-8") as f:
+    with open(os.path.join(pasta, "feed.xml"), "w", encoding="utf-8") as f:
         f.write(gerar_feed(pod, eps, hoje))
     print(f"feed.xml: {sum(1 for e in eps if date.fromisoformat(e['data']) <= hoje)} episódio(s) até {hoje}")
 

@@ -1,0 +1,13 @@
+{
+ "titulo": "Oração da Manhã · Versículo e Café",
+ "descricao": "Todo dia, bem cedo, uma leitura da Bíblia, uma reflexão curta para a vida real e uma oração para levar para o dia. Narração com voz gerada por IA; textos bíblicos da Bíblia Livre.",
+ "autor": "Versículo e Café",
+ "site": "https://www.youtube.com/@versiculoecafe",
+ "base": "https://diegofelippe.github.io/dinocuts/versiculo/",
+ "capa": "capa.jpg",
+ "categoria": "Religion & Spirituality",
+ "subcategoria": "Christianity",
+ "idioma": "pt-br",
+ "guid": "versiculoecafe",
+ "hora": 5
+}

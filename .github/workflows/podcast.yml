@@ -24,8 +24,10 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Gerar feed do podcast
-        run: python3 podcast/gerar_feed.py
+      - name: Gerar feeds dos podcasts
+        run: |
+          python3 podcast/gerar_feed.py
+          if [ -f versiculo/podcast.json ]; then python3 podcast/gerar_feed.py versiculo; fi
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
